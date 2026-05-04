@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getMinutesList } from '../lib/minutes';
+
+const minutes = await getMinutesList();
+---
+
+<BaseLayout title="All Minutes">
+  <section class="search-bar">
+    <label for="search">Search minutes</label>
+    <input id="search" type="search" placeholder="Search by title or keyword" />
+  </section>
+
+  {minutes.length ? (
+    <>
+      <ul class="minute-list" id="minute-list">
+        {minutes.map((minute) => (
+          <li
+            class="minute-card"
+            data-minute
+            data-search={`${minute.title} ${minute.excerpt} ${minute.slug}`.toLowerCase()}
+          >
+            <span class="minute-meta">{minute.dateLabel}</span>
+            <h2>
+              <a href={`/minutes/${minute.slug}`}>{minute.title}</a>
+            </h2>
+            <p>{minute.excerpt}</p>
+          </li>
+        ))}
+      </ul>
+      <div class="empty-state" id="no-results" hidden>
+        No minutes match your search.
+      </div>
+    </>
+  ) : (
+    <div class="empty-state">No minutes available yet.</div>
+  )}
+
+  {minutes.length ? (
+    <script>
+      {`
+        const input = document.querySelector('#search');
+        const items = Array.from(document.querySelectorAll('[data-minute]'));
+        const emptyState = document.querySelector('#no-results');
+
+        const update = () => {
+          const query = input.value.trim().toLowerCase();
+          let visibleCount = 0;
+          items.forEach((item) => {
+            const haystack = item.dataset.search || '';
+            const match = haystack.includes(query);
+            item.hidden = !match;
+            if (match) visibleCount += 1;
+          });
+          if (emptyState) {
+            emptyState.hidden = visibleCount !== 0;
+          }
+        };
+
+        input.addEventListener('input', update);
+        update();
+      `}
+    </script>
+  ) : null}
+</BaseLayout>

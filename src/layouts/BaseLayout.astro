@@ -1,0 +1,25 @@
+---
+import '../styles/global.css';
+
+const { title } = Astro.props;
+const pageTitle = title ? `${title} | Meeting Minutes` : 'Meeting Minutes';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <main class="page">
+      <header class="site-header">
+        <a class="site-title" href="/">Meeting Minutes</a>
+        <span class="site-subtitle">Maker Faire Kochi 2026</span>
+      </header>
+      <section class="content">
+        <slot />
+      </section>
+    </main>
+  </body>
+</html>

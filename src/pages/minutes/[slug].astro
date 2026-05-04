@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getMinuteBySlug, getMinutesList } from '../../lib/minutes';
+
+export async function getStaticPaths() {
+  const minutes = await getMinutesList();
+  const paths = await Promise.all(
+    minutes.map(async (minute) => {
+      const detail = await getMinuteBySlug(minute.slug);
+      if (!detail) return null;
+      return {
+        params: { slug: minute.slug },
+        props: { minute: detail },
+      };
+    })
+  );
+
+  return paths.filter(Boolean);
+}
+
+const { minute } = Astro.props;
+if (!minute) {
+  throw new Error('Minute not found.');
+}
+---
+
+<BaseLayout title={minute.title}>
+  <a class="back-link" href="/">← Back to all minutes</a>
+  <div class="minute-content">
+    <span class="minute-meta">{minute.dateLabel}</span>
+    <h1>{minute.title}</h1>
+    <article set:html={minute.html} />
+  </div>
+</BaseLayout>
